@@ -1,6 +1,22 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 const API_URL = `${BASE_URL}/api`;
 
+export interface ApiValidationError {
+  message: string;
+  errors: Record<string, string[]>;
+}
+
+export class ApiError extends Error {
+  status: number;
+  errors: Record<string, string[]>;
+
+  constructor(message: string, status: number, errors: Record<string, string[]> = {}) {
+    super(message);
+    this.status = status;
+    this.errors = errors;
+  }
+}
+
 class ApiClient {
   async getCsrfCookie(): Promise<void> {
     await fetch(`${BASE_URL}/sanctum/csrf-cookie`, {
@@ -27,22 +43,34 @@ class ApiClient {
       ...options.headers,
     };
 
-    const response = await fetch(`${API_URL}${endpoint}`, {
-      ...options,
-      headers,
-      credentials: 'include',
-    });
+    let response: Response;
+    try {
+      response = await fetch(`${API_URL}${endpoint}`, {
+        ...options,
+        headers,
+        credentials: 'include',
+      });
+    } catch {
+      throw new ApiError(
+        'Unable to connect to the server. Please check your connection and try again.',
+        0
+      );
+    }
 
     if (response.status === 401) {
       if (typeof window !== 'undefined' && !endpoint.includes('/me')) {
         window.location.href = '/login';
       }
-      throw new Error('Unauthorized');
+      throw new ApiError('Unauthorized', 401);
     }
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || `Request failed: ${response.status}`);
+      const body = await response.json().catch(() => ({}));
+      throw new ApiError(
+        body.message || `Request failed: ${response.status}`,
+        response.status,
+        body.errors || {}
+      );
     }
 
     return response.json();
