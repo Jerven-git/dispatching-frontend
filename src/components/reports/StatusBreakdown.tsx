@@ -1,6 +1,7 @@
 'use client';
 
 import { statusColors, statusLabels } from '@/lib/job-constants';
+import { Card } from '@/components/ui';
 import type { JobsByStatusItem, JobStatus } from '@/types';
 
 interface StatusBreakdownProps {
@@ -11,21 +12,21 @@ interface StatusBreakdownProps {
 export default function StatusBreakdown({ data, loading }: StatusBreakdownProps) {
   if (loading) {
     return (
-      <div className="rounded-lg bg-white p-6 shadow-sm">
+      <Card>
         <div className="h-6 w-40 rounded bg-gray-200 animate-pulse mb-4" />
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="h-10 rounded bg-gray-200 animate-pulse" />
           ))}
         </div>
-      </div>
+      </Card>
     );
   }
 
   const total = data.reduce((sum, item) => sum + item.count, 0);
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow-sm">
+    <Card>
       <h2 className="mb-4 text-lg font-semibold">Jobs by Status</h2>
 
       {data.length === 0 ? (
@@ -48,7 +49,7 @@ export default function StatusBreakdown({ data, loading }: StatusBreakdownProps)
                 <div className="flex-1">
                   <div className="h-5 rounded-full bg-gray-100">
                     <div
-                      className="h-5 rounded-full bg-blue-500 transition-all duration-300"
+                      className="h-5 rounded-full bg-indigo-500 transition-all duration-300"
                       style={{ width: `${Math.max(pct, 1)}%` }}
                     />
                   </div>
@@ -79,6 +80,6 @@ export default function StatusBreakdown({ data, loading }: StatusBreakdownProps)
           </div>
         </div>
       )}
-    </div>
+    </Card>
   );
 }

@@ -21,21 +21,23 @@ export default function DispatcherDashboard() {
 
   const statCards = stats
     ? [
-        { label: "Today's Jobs", value: stats.todays_jobs, color: 'bg-blue-500' },
-        { label: 'Pending', value: stats.pending_jobs, color: 'bg-yellow-500' },
-        { label: 'Assigned', value: stats.assigned_jobs, color: 'bg-indigo-500' },
-        { label: 'In Progress', value: stats.in_progress_jobs, color: 'bg-orange-500' },
-        { label: 'Completed', value: stats.completed_jobs, color: 'bg-green-500' },
-        { label: 'Customers', value: stats.total_customers ?? 0, color: 'bg-purple-500' },
+        { label: "Today's Jobs", value: stats.todays_jobs, color: 'bg-indigo-500', textColor: 'text-indigo-600' },
+        { label: 'Pending', value: stats.pending_jobs, color: 'bg-yellow-500', textColor: 'text-yellow-600' },
+        { label: 'Assigned', value: stats.assigned_jobs, color: 'bg-indigo-500', textColor: 'text-indigo-600' },
+        { label: 'In Progress', value: stats.in_progress_jobs, color: 'bg-orange-500', textColor: 'text-orange-500' },
+        { label: 'Completed', value: stats.completed_jobs, color: 'bg-green-500', textColor: 'text-green-600' },
+        { label: 'Customers', value: stats.total_customers ?? 0, color: 'bg-purple-500', textColor: 'text-purple-600' },
       ]
     : [];
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold">Dispatcher Dashboard</h1>
-      <p className="mb-6 text-gray-600">
-        Welcome back, {user?.name}. Manage jobs and dispatch technicians.
-      </p>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Welcome back, {user?.name}. Manage jobs and dispatch technicians.
+        </p>
+      </div>
       <StatsGrid stats={statCards} loading={loading} />
     </div>
   );

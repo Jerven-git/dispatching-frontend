@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
+import { Card, Select, Button } from '@/components/ui';
 import type { ServiceJob, TechnicianWorkload } from '@/types';
 
 interface TechnicianAssignPanelProps {
@@ -65,17 +66,17 @@ export default function TechnicianAssignPanel({
 
   if (loading) {
     return (
-      <div className="rounded-lg bg-white p-6 shadow-sm">
+      <Card>
         <div className="animate-pulse space-y-3">
           <div className="h-5 w-32 rounded bg-gray-200" />
           <div className="h-10 rounded bg-gray-200" />
         </div>
-      </div>
+      </Card>
     );
   }
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow-sm">
+    <Card>
       <h2 className="mb-4 text-lg font-semibold">Assign Technician</h2>
 
       {/* Current assignment */}
@@ -86,13 +87,15 @@ export default function TechnicianAssignPanel({
             <p className="text-xs text-blue-700">{job.technician.email}</p>
           </div>
           {!isTerminal && (
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={handleUnassign}
               disabled={assigning}
-              className="text-xs font-medium text-red-600 hover:text-red-800 disabled:opacity-50"
+              className="text-red-600 hover:text-red-800 hover:bg-red-50"
             >
               Unassign
-            </button>
+            </Button>
           )}
         </div>
       )}
@@ -100,33 +103,30 @@ export default function TechnicianAssignPanel({
       {!isTerminal && (
         <>
           {/* Technician selector */}
-          <select
-            value={selectedId}
-            onChange={(e) => setSelectedId(e.target.value)}
-            disabled={assigning}
-            className="mb-3 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
-          >
-            <option value="">Select a technician</option>
-            {technicians.map((tech) => (
-              <option key={tech.id} value={tech.id}>
-                {tech.name} ({tech.active_jobs} active, {tech.today_jobs} today)
-              </option>
-            ))}
-          </select>
+          <div className="mb-3">
+            <Select
+              value={selectedId}
+              onChange={(e) => setSelectedId(e.target.value)}
+              disabled={assigning}
+              placeholder="Select a technician"
+              options={technicians.map((tech) => ({
+                value: tech.id,
+                label: `${tech.name} (${tech.active_jobs} active, ${tech.today_jobs} today)`,
+              }))}
+              fullWidth
+            />
+          </div>
 
           {/* Assign button */}
           {hasChanged && selectedId && (
-            <button
+            <Button
+              variant="primary"
+              fullWidth
               onClick={handleAssign}
-              disabled={assigning}
-              className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+              loading={assigning}
             >
-              {assigning
-                ? 'Assigning...'
-                : job.technician
-                  ? 'Reassign'
-                  : 'Assign'}
-            </button>
+              {job.technician ? 'Reassign' : 'Assign'}
+            </Button>
           )}
 
           {/* Workload summary */}
@@ -169,6 +169,6 @@ export default function TechnicianAssignPanel({
           )}
         </>
       )}
-    </div>
+    </Card>
   );
 }

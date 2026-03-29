@@ -5,11 +5,17 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import {
-  statusColors,
   statusLabels,
-  priorityColors,
   priorityLabels,
 } from '@/lib/job-constants';
+import {
+  Button,
+  Card,
+  Badge,
+  PageHeader,
+  getStatusBadgeVariant,
+  getPriorityBadgeVariant,
+} from '@/components/ui';
 import TechnicianAssignPanel from './TechnicianAssignPanel';
 import JobStatusHistory from './JobStatusHistory';
 import type { ServiceJob } from '@/types';
@@ -86,9 +92,9 @@ export default function JobDetail({
 
   if (!job) {
     return (
-      <div className="rounded-lg bg-white p-12 text-center text-gray-500 shadow-sm">
-        Job not found.
-      </div>
+      <Card padding="lg">
+        <p className="text-center text-gray-500">Job not found.</p>
+      </Card>
     );
   }
 
@@ -97,52 +103,34 @@ export default function JobDetail({
   return (
     <div>
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <Link href={basePath} className="text-sm text-blue-600 hover:text-blue-800">
-            &larr; Back to Jobs
-          </Link>
-          <div className="mt-2 flex items-center gap-3">
-            <h1 className="text-2xl font-bold">{job.reference_number}</h1>
-            <span
-              className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                statusColors[job.status]
-              }`}
-            >
+      <PageHeader
+        title={job.reference_number}
+        backLink={{ href: basePath, label: 'Back to Jobs' }}
+        actions={
+          <>
+            <Badge variant={getStatusBadgeVariant(job.status)}>
               {statusLabels[job.status]}
-            </span>
-            <span
-              className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                priorityColors[job.priority]
-              }`}
-            >
+            </Badge>
+            <Badge variant={getPriorityBadgeVariant(job.priority)}>
               {priorityLabels[job.priority]}
-            </span>
-          </div>
-        </div>
-        <div className="flex gap-3">
-          {canEdit && !isTerminal && (
-            <Link
-              href={`${basePath}/${job.id}/edit`}
-              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-            >
-              Edit
-            </Link>
-          )}
-          {canDelete && (
-            <button
-              onClick={handleDelete}
-              className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
-            >
-              Delete
-            </button>
-          )}
-        </div>
-      </div>
+            </Badge>
+            {canEdit && !isTerminal && (
+              <Link href={`${basePath}/${job.id}/edit`}>
+                <Button variant="primary" size="sm">Edit</Button>
+              </Link>
+            )}
+            {canDelete && (
+              <Button variant="destructive" size="sm" onClick={handleDelete}>
+                Delete
+              </Button>
+            )}
+          </>
+        }
+      />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Main Details */}
-        <div className="lg:col-span-2 rounded-lg bg-white p-6 shadow-sm">
+        <Card className="lg:col-span-2">
           <h2 className="mb-4 text-lg font-semibold">Job Details</h2>
           <dl className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
             <div>
@@ -201,7 +189,7 @@ export default function JobDetail({
               </div>
             )}
           </dl>
-        </div>
+        </Card>
 
         {/* Status History */}
         {job.status_logs && job.status_logs.length > 0 && (
@@ -213,7 +201,7 @@ export default function JobDetail({
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Timeline */}
-          <div className="rounded-lg bg-white p-6 shadow-sm">
+          <Card>
             <h2 className="mb-4 text-lg font-semibold">Timeline</h2>
             <dl className="space-y-3">
               <div>
@@ -247,7 +235,7 @@ export default function JobDetail({
                 </div>
               )}
             </dl>
-          </div>
+          </Card>
 
           {/* Assignment Panel */}
           {canAssign && (
@@ -256,45 +244,50 @@ export default function JobDetail({
 
           {/* Status Actions */}
           {canChangeStatus && !isTerminal && (
-            <div className="rounded-lg bg-white p-6 shadow-sm">
+            <Card>
               <h2 className="mb-4 text-lg font-semibold">Update Status</h2>
               <div className="flex flex-col gap-2">
                 {job.status === 'assigned' && (
-                  <button
+                  <Button
                     onClick={() => handleStatusChange('on_the_way')}
                     disabled={updating}
-                    className="rounded-md bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 disabled:opacity-50"
+                    fullWidth
+                    className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800"
                   >
                     On the Way
-                  </button>
+                  </Button>
                 )}
                 {(job.status === 'assigned' || job.status === 'on_the_way') && (
-                  <button
+                  <Button
                     onClick={() => handleStatusChange('in_progress')}
                     disabled={updating}
-                    className="rounded-md bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 disabled:opacity-50"
+                    fullWidth
+                    className="bg-orange-600 hover:bg-orange-700 active:bg-orange-800"
                   >
                     Start Job
-                  </button>
+                  </Button>
                 )}
                 {job.status === 'in_progress' && (
-                  <button
+                  <Button
                     onClick={() => handleStatusChange('completed')}
                     disabled={updating}
-                    className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+                    fullWidth
+                    className="bg-green-600 hover:bg-green-700 active:bg-green-800"
                   >
                     Mark Completed
-                  </button>
+                  </Button>
                 )}
-                <button
+                <Button
+                  variant="outline"
                   onClick={() => handleStatusChange('cancelled')}
                   disabled={updating}
-                  className="rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
+                  fullWidth
+                  className="border-red-300 text-red-600 hover:bg-red-50"
                 >
                   Cancel Job
-                </button>
+                </Button>
               </div>
-            </div>
+            </Card>
           )}
         </div>
       </div>

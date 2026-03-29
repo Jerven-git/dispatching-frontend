@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Card, Input } from '@/components/ui';
 
 interface DateRangeFilterProps {
   from: string;
@@ -70,7 +71,7 @@ export default function DateRangeFilter({ from, to, onChange }: DateRangeFilterP
   };
 
   return (
-    <div className="rounded-lg bg-white p-4 shadow-sm">
+    <Card padding="sm">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Preset buttons */}
         <div className="flex flex-wrap gap-2">
@@ -80,7 +81,7 @@ export default function DateRangeFilter({ from, to, onChange }: DateRangeFilterP
               onClick={() => handlePreset(preset.value)}
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                 activePreset === preset.value
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-indigo-600 text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -91,21 +92,19 @@ export default function DateRangeFilter({ from, to, onChange }: DateRangeFilterP
 
         {/* Custom date inputs */}
         <div className="flex items-center gap-2">
-          <input
+          <Input
             type="date"
             value={from}
             onChange={(e) => handleCustomChange('from', e.target.value)}
-            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm"
           />
           <span className="text-gray-400">to</span>
-          <input
+          <Input
             type="date"
             value={to}
             onChange={(e) => handleCustomChange('to', e.target.value)}
-            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm"
           />
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

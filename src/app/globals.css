@@ -1,1 +1,72 @@
 @import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-primary: #6366f1; /* Indigo */
+    --color-primary-dark: #4f46e5;
+    --color-accent: #0d9488; /* Teal */
+    --color-alert: #f97316; /* Orange */
+    --color-border: #e5e7eb;
+    --color-bg: #ffffff;
+    --color-text: #111827;
+    --color-text-secondary: #6b7280;
+
+    /* Focus ring */
+    --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-primary);
+  }
+
+  * {
+    @apply border-inherit;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+
+  /* Focus visible for accessibility */
+  *:focus-visible {
+    @apply outline-none;
+  }
+
+  /* Button base styles */
+  button,
+  [type="button"],
+  [type="submit"],
+  [type="reset"] {
+    @apply transition-all duration-150 ease-in-out;
+  }
+
+  /* Input focus states */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    @apply outline-none ring-2 ring-indigo-500 ring-offset-0;
+  }
+
+  /* Smooth transitions */
+  a {
+    @apply transition-colors duration-150;
+  }
+}
+
+@layer components {
+  /* Utility classes for common patterns */
+  .text-sm-medium {
+    @apply text-sm font-medium;
+  }
+
+  .text-base-medium {
+    @apply text-base font-medium;
+  }
+
+  .text-lg-medium {
+    @apply text-lg font-medium;
+  }
+
+  .truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
