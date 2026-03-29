@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useFormSubmit } from '@/hooks/useFormSubmit';
+import { FormField, Button, Alert, Textarea } from '@/components/ui';
 import type { ServiceFormData, Service } from '@/types';
 
 interface ServiceFormProps {
@@ -44,48 +45,29 @@ export default function ServiceForm({
     clearFieldError(field);
   };
 
-  const fieldError = (field: string) =>
-    errors[field]?.[0] ? (
-      <p className="mt-1 text-sm text-red-600">{errors[field][0]}</p>
-    ) : null;
-
-  const inputClass = (field: string) =>
-    `mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-1 ${
-      errors[field]
-        ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-        : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
-    }`;
-
   return (
     <form onSubmit={(e) => handleSubmit(e, () => onSubmit(form))} className="space-y-6">
-      {generalError && (
-        <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">
-          {generalError}
-        </div>
-      )}
+      {generalError && <Alert variant="error">{generalError}</Alert>}
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <div className="sm:col-span-2">
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-            Service Name <span className="text-red-500">*</span>
-          </label>
-          <input
-            id="name"
+          <FormField
+            name="name"
             type="text"
+            label="Service Name"
             required
             value={form.name}
             onChange={(e) => handleChange('name', e.target.value)}
+            error={errors['name']?.[0]}
             placeholder="e.g. Aircon General Cleaning"
-            className={inputClass('name')}
           />
-          {fieldError('name')}
         </div>
 
         <div>
-          <label htmlFor="base_price" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="base_price" className="block text-sm font-medium text-gray-700 mb-1.5">
             Base Price
           </label>
-          <div className="relative mt-1">
+          <div className="relative">
             <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
               $
             </span>
@@ -97,50 +79,42 @@ export default function ServiceForm({
               value={form.base_price}
               onChange={(e) => handleChange('base_price', e.target.value)}
               placeholder="0.00"
-              className={`pl-7 ${inputClass('base_price')}`}
+              className="block w-full pl-7 px-3 py-2 rounded-base border border-gray-300 text-sm placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
             />
           </div>
-          {fieldError('base_price')}
+          {errors['base_price']?.[0] && <p className="mt-1 text-sm text-red-600">{errors['base_price'][0]}</p>}
         </div>
 
-        <div>
-          <label htmlFor="estimated_duration_minutes" className="block text-sm font-medium text-gray-700">
-            Estimated Duration (minutes)
-          </label>
-          <input
-            id="estimated_duration_minutes"
-            type="number"
-            min="1"
-            value={form.estimated_duration_minutes}
-            onChange={(e) => handleChange('estimated_duration_minutes', e.target.value)}
-            placeholder="e.g. 60"
-            className={inputClass('estimated_duration_minutes')}
-          />
-          {fieldError('estimated_duration_minutes')}
-        </div>
+        <FormField
+          name="estimated_duration_minutes"
+          type="number"
+          label="Estimated Duration (minutes)"
+          min="1"
+          value={form.estimated_duration_minutes}
+          onChange={(e) => handleChange('estimated_duration_minutes', e.target.value)}
+          error={errors['estimated_duration_minutes']?.[0]}
+          placeholder="e.g. 60"
+        />
 
         <div className="sm:col-span-2">
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-            Description
-          </label>
-          <textarea
+          <Textarea
             id="description"
+            label="Description"
             rows={3}
             value={form.description}
             onChange={(e) => handleChange('description', e.target.value)}
             placeholder="Brief description of the service..."
-            className={inputClass('description')}
+            error={errors['description']?.[0]}
           />
-          {fieldError('description')}
         </div>
 
         <div className="sm:col-span-2">
-          <label className="flex items-center gap-2">
+          <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
               checked={form.is_active}
               onChange={(e) => handleChange('is_active', e.target.checked)}
-              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
             />
             <span className="text-sm font-medium text-gray-700">Active</span>
           </label>
@@ -150,21 +124,13 @@ export default function ServiceForm({
         </div>
       </div>
 
-      <div className="flex justify-end gap-3">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-        >
+      <div className="flex justify-end gap-3 pt-4">
+        <Button type="button" variant="secondary" onClick={onCancel} disabled={submitting}>
           Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={submitting}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-        >
-          {submitting ? 'Saving...' : submitLabel}
-        </button>
+        </Button>
+        <Button type="submit" variant="primary" loading={submitting}>
+          {submitLabel}
+        </Button>
       </div>
     </form>
   );

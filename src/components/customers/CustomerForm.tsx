@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useFormSubmit } from '@/hooks/useFormSubmit';
+import { FormField, Button, Alert, Textarea } from '@/components/ui';
 import type { CustomerFormData, Customer } from '@/types';
 
 interface CustomerFormProps {
@@ -50,118 +51,100 @@ export default function CustomerForm({
     clearFieldError(field);
   };
 
-  const fieldError = (field: string) =>
-    errors[field]?.[0] ? (
-      <p className="mt-1 text-sm text-red-600">{errors[field][0]}</p>
-    ) : null;
-
-  const inputClass = (field: string) =>
-    `mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-1 ${
-      errors[field]
-        ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-        : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
-    }`;
-
   return (
     <form onSubmit={(e) => handleSubmit(e, () => onSubmit(form))} className="space-y-6">
-      {generalError && (
-        <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">
-          {generalError}
-        </div>
-      )}
+      {generalError && <Alert variant="error">{generalError}</Alert>}
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-            Name <span className="text-red-500">*</span>
-          </label>
-          <input
-            id="name"
-            type="text"
-            required
-            value={form.name}
-            onChange={(e) => handleChange('name', e.target.value)}
-            className={inputClass('name')}
-          />
-          {fieldError('name')}
-        </div>
+        <FormField
+          name="name"
+          type="text"
+          label="Name"
+          required
+          value={form.name}
+          onChange={(e) => handleChange('name', e.target.value)}
+          error={errors['name']?.[0]}
+        />
 
-        <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-            Phone <span className="text-red-500">*</span>
-          </label>
-          <input
-            id="phone"
-            type="text"
-            required
-            value={form.phone}
-            onChange={(e) => handleChange('phone', e.target.value)}
-            className={inputClass('phone')}
-          />
-          {fieldError('phone')}
-        </div>
+        <FormField
+          name="phone"
+          type="text"
+          label="Phone"
+          required
+          value={form.phone}
+          onChange={(e) => handleChange('phone', e.target.value)}
+          error={errors['phone']?.[0]}
+        />
 
         <div className="sm:col-span-2">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            Email
-          </label>
-          <input
-            id="email"
+          <FormField
+            name="email"
             type="email"
+            label="Email"
             value={form.email}
             onChange={(e) => handleChange('email', e.target.value)}
-            className={inputClass('email')}
+            error={errors['email']?.[0]}
           />
-          {fieldError('email')}
         </div>
 
         <div className="sm:col-span-2">
-          <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-            Address <span className="text-red-500">*</span>
-          </label>
-          <input
-            id="address"
+          <FormField
+            name="address"
             type="text"
+            label="Address"
             required
             value={form.address}
             onChange={(e) => handleChange('address', e.target.value)}
-            className={inputClass('address')}
+            error={errors['address']?.[0]}
           />
-          {fieldError('address')}
         </div>
 
-        <div>
-          <label htmlFor="city" className="block text-sm font-medium text-gray-700">City</label>
-          <input id="city" type="text" value={form.city} onChange={(e) => handleChange('city', e.target.value)} className={inputClass('city')} />
-          {fieldError('city')}
-        </div>
+        <FormField
+          name="city"
+          type="text"
+          label="City"
+          value={form.city}
+          onChange={(e) => handleChange('city', e.target.value)}
+          error={errors['city']?.[0]}
+        />
 
-        <div>
-          <label htmlFor="state" className="block text-sm font-medium text-gray-700">State</label>
-          <input id="state" type="text" value={form.state} onChange={(e) => handleChange('state', e.target.value)} className={inputClass('state')} />
-          {fieldError('state')}
-        </div>
+        <FormField
+          name="state"
+          type="text"
+          label="State"
+          value={form.state}
+          onChange={(e) => handleChange('state', e.target.value)}
+          error={errors['state']?.[0]}
+        />
 
-        <div>
-          <label htmlFor="zip_code" className="block text-sm font-medium text-gray-700">Zip Code</label>
-          <input id="zip_code" type="text" value={form.zip_code} onChange={(e) => handleChange('zip_code', e.target.value)} className={inputClass('zip_code')} />
-          {fieldError('zip_code')}
-        </div>
+        <FormField
+          name="zip_code"
+          type="text"
+          label="Zip Code"
+          value={form.zip_code}
+          onChange={(e) => handleChange('zip_code', e.target.value)}
+          error={errors['zip_code']?.[0]}
+        />
 
         <div className="sm:col-span-2">
-          <label htmlFor="notes" className="block text-sm font-medium text-gray-700">Notes</label>
-          <textarea id="notes" rows={3} value={form.notes} onChange={(e) => handleChange('notes', e.target.value)} className={inputClass('notes')} />
-          {fieldError('notes')}
+          <Textarea
+            id="notes"
+            label="Notes"
+            rows={3}
+            value={form.notes}
+            onChange={(e) => handleChange('notes', e.target.value)}
+            error={errors['notes']?.[0]}
+          />
         </div>
       </div>
 
-      <div className="flex justify-end gap-3">
-        <button type="button" onClick={onCancel} className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+      <div className="flex justify-end gap-3 pt-4">
+        <Button type="button" variant="secondary" onClick={onCancel} disabled={submitting}>
           Cancel
-        </button>
-        <button type="submit" disabled={submitting} className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50">
-          {submitting ? 'Saving...' : submitLabel}
-        </button>
+        </Button>
+        <Button type="submit" variant="primary" loading={submitting}>
+          {submitLabel}
+        </Button>
       </div>
     </form>
   );

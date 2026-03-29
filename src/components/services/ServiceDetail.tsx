@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { Button, Card, Badge, PageHeader } from '@/components/ui';
 import type { Service } from '@/types';
 
 interface ServiceDetailProps {
@@ -49,50 +50,33 @@ export default function ServiceDetail({ serviceId, basePath }: ServiceDetailProp
 
   if (!service) {
     return (
-      <div className="rounded-lg bg-white p-12 text-center text-gray-500 shadow-sm">
-        Service not found.
-      </div>
+      <Card padding="lg">
+        <p className="text-center text-gray-500">Service not found.</p>
+      </Card>
     );
   }
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <Link href={basePath} className="text-sm text-blue-600 hover:text-blue-800">
-            &larr; Back to Services
-          </Link>
-          <div className="mt-2 flex items-center gap-3">
-            <h1 className="text-2xl font-bold">{service.name}</h1>
-            <span
-              className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                service.is_active
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-red-100 text-red-800'
-              }`}
-            >
+      <PageHeader
+        title={service.name}
+        backLink={{ href: basePath, label: 'Back to Services' }}
+        actions={
+          <>
+            <Badge variant={service.is_active ? 'success' : 'danger'}>
               {service.is_active ? 'Active' : 'Inactive'}
-            </span>
-          </div>
-        </div>
-        <div className="flex gap-3">
-          <Link
-            href={`${basePath}/${service.id}/edit`}
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-          >
-            Edit
-          </Link>
-          <button
-            onClick={handleDelete}
-            disabled={deleting}
-            className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
-          >
-            {deleting ? 'Deleting...' : 'Delete'}
-          </button>
-        </div>
-      </div>
+            </Badge>
+            <Link href={`${basePath}/${service.id}/edit`}>
+              <Button variant="primary" size="sm">Edit</Button>
+            </Link>
+            <Button variant="destructive" size="sm" onClick={handleDelete} loading={deleting}>
+              Delete
+            </Button>
+          </>
+        }
+      />
 
-      <div className="rounded-lg bg-white p-6 shadow-sm">
+      <Card>
         <dl className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
           <div>
             <dt className="text-sm font-medium text-gray-500">Base Price</dt>
@@ -123,7 +107,7 @@ export default function ServiceDetail({ serviceId, basePath }: ServiceDetailProp
             </dd>
           </div>
         </dl>
-      </div>
+      </Card>
     </div>
   );
 }

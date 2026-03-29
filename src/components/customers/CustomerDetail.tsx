@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { Button, Card, PageHeader } from '@/components/ui';
 import type { Customer } from '@/types';
 
 interface CustomerDetailProps {
@@ -49,39 +50,30 @@ export default function CustomerDetail({ customerId, basePath }: CustomerDetailP
 
   if (!customer) {
     return (
-      <div className="rounded-lg bg-white p-12 text-center text-gray-500 shadow-sm">
-        Customer not found.
-      </div>
+      <Card padding="lg">
+        <p className="text-center text-gray-500">Customer not found.</p>
+      </Card>
     );
   }
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <Link href={basePath} className="text-sm text-blue-600 hover:text-blue-800">
-            &larr; Back to Customers
-          </Link>
-          <h1 className="mt-2 text-2xl font-bold">{customer.name}</h1>
-        </div>
-        <div className="flex gap-3">
-          <Link
-            href={`${basePath}/${customer.id}/edit`}
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-          >
-            Edit
-          </Link>
-          <button
-            onClick={handleDelete}
-            disabled={deleting}
-            className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
-          >
-            {deleting ? 'Deleting...' : 'Delete'}
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title={customer.name}
+        backLink={{ href: basePath, label: 'Back to Customers' }}
+        actions={
+          <>
+            <Link href={`${basePath}/${customer.id}/edit`}>
+              <Button variant="primary" size="sm">Edit</Button>
+            </Link>
+            <Button variant="destructive" size="sm" onClick={handleDelete} loading={deleting}>
+              Delete
+            </Button>
+          </>
+        }
+      />
 
-      <div className="rounded-lg bg-white p-6 shadow-sm">
+      <Card>
         <dl className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
           <div>
             <dt className="text-sm font-medium text-gray-500">Phone</dt>
@@ -113,7 +105,7 @@ export default function CustomerDetail({ customerId, basePath }: CustomerDetailP
             </dd>
           </div>
         </dl>
-      </div>
+      </Card>
     </div>
   );
 }

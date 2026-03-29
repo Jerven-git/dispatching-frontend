@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { statusLabels } from '@/lib/job-constants';
 import TechnicianJobCard from '@/components/jobs/TechnicianJobCard';
+import { Button, Card } from '@/components/ui';
 import type { ServiceJob, PaginatedResponse, JobStatus } from '@/types';
 
 const tabs: { label: string; value: string }[] = [
@@ -58,13 +59,9 @@ export default function TechnicianMyJobsPage() {
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-xl font-bold md:text-2xl">My Jobs</h1>
-        <button
-          onClick={handleRefresh}
-          disabled={refreshing}
-          className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-600 active:bg-gray-100 disabled:opacity-50"
-        >
-          {refreshing ? 'Refreshing...' : 'Refresh'}
-        </button>
+        <Button variant="outline" size="sm" onClick={handleRefresh} loading={refreshing}>
+          Refresh
+        </Button>
       </div>
 
       {/* Status filter tabs (horizontal scroll on mobile) */}
@@ -76,7 +73,7 @@ export default function TechnicianMyJobsPage() {
               onClick={() => setStatusFilter(tab.value)}
               className={`rounded-full px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-colors ${
                 statusFilter === tab.value
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-indigo-600 text-white'
                   : 'bg-white text-gray-600 border border-gray-300 active:bg-gray-100'
               }`}
             >
@@ -94,11 +91,13 @@ export default function TechnicianMyJobsPage() {
           ))}
         </div>
       ) : jobs.length === 0 ? (
-        <div className="rounded-lg bg-white p-12 text-center text-gray-500 shadow-sm">
-          {statusFilter
-            ? `No ${statusLabels[statusFilter as JobStatus].toLowerCase()} jobs.`
-            : 'No jobs assigned to you.'}
-        </div>
+        <Card padding="lg">
+          <p className="text-center text-gray-500">
+            {statusFilter
+              ? `No ${statusLabels[statusFilter as JobStatus].toLowerCase()} jobs.`
+              : 'No jobs assigned to you.'}
+          </p>
+        </Card>
       ) : (
         <div className="space-y-3">
           {jobs.map((job) => (

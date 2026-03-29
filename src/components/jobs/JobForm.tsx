@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { useFormSubmit } from '@/hooks/useFormSubmit';
 import { JOB_PRIORITIES, priorityLabels } from '@/lib/job-constants';
+import { FormField, Button, Alert, Select, Textarea } from '@/components/ui';
 import type {
   ServiceJobFormData,
   ServiceJob,
@@ -64,13 +65,13 @@ export default function JobForm({
   useEffect(() => {
     Promise.all([
       api.get<PaginatedResponse<Customer>>('/customers', { per_page: '100' }),
-      api.get<PaginatedResponse<Service>>('/services', { active_only: '1' }),
-      api.get<{ users: User[] }>('/users/technicians'),
+      api.get<PaginatedResponse<Service>>('/services', { active_only: '1' }).catch(() => ({ data: [] })),
+      api.get<{ users: User[] }>('/users/technicians').catch(() => ({ users: [] })),
     ])
       .then(([customerData, serviceData, techData]) => {
-        setCustomers(customerData.data);
-        setServices(serviceData.data);
-        setTechnicians(techData.users);
+        setCustomers(customerData.data ?? []);
+        setServices(serviceData.data ?? []);
+        setTechnicians(techData.users ?? []);
       })
       .catch(console.error)
       .finally(() => setLoadingOptions(false));
@@ -106,18 +107,6 @@ export default function JobForm({
     clearFieldError(field);
   };
 
-  const fieldError = (field: string) =>
-    errors[field]?.[0] ? (
-      <p className="mt-1 text-sm text-red-600">{errors[field][0]}</p>
-    ) : null;
-
-  const inputClass = (field: string) =>
-    `mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-1 ${
-      errors[field]
-        ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-        : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
-    }`;
-
   if (loadingOptions) {
     return (
       <div className="animate-pulse space-y-4">
@@ -130,152 +119,107 @@ export default function JobForm({
 
   return (
     <form onSubmit={(e) => handleSubmit(e, () => onSubmit(form))} className="space-y-6">
-      {generalError && (
-        <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">
-          {generalError}
-        </div>
-      )}
+      {generalError && <Alert variant="error">{generalError}</Alert>}
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         {/* Customer */}
-        <div>
-          <label htmlFor="customer_id" className="block text-sm font-medium text-gray-700">
-            Customer <span className="text-red-500">*</span>
-          </label>
-          <select
-            id="customer_id"
-            required
-            value={form.customer_id}
-            onChange={(e) => handleCustomerChange(e.target.value)}
-            className={inputClass('customer_id')}
-          >
-            <option value="">Select a customer</option>
-            {customers.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name} - {c.phone}
-              </option>
-            ))}
-          </select>
-          {fieldError('customer_id')}
-        </div>
+        <Select
+          name="customer_id"
+          label="Customer"
+          required
+          value={form.customer_id}
+          onChange={(e) => handleCustomerChange(e.target.value)}
+          error={errors['customer_id']?.[0]}
+          options={customers.map((c) => ({
+            value: c.id,
+            label: `${c.name} - ${c.phone}`,
+          }))}
+          placeholder="Select a customer"
+        />
 
         {/* Service */}
-        <div>
-          <label htmlFor="service_id" className="block text-sm font-medium text-gray-700">
-            Service <span className="text-red-500">*</span>
-          </label>
-          <select
-            id="service_id"
-            required
-            value={form.service_id}
-            onChange={(e) => handleServiceChange(e.target.value)}
-            className={inputClass('service_id')}
-          >
-            <option value="">Select a service</option>
-            {services.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name} - ${parseFloat(s.base_price).toFixed(2)}
-              </option>
-            ))}
-          </select>
-          {fieldError('service_id')}
-        </div>
+        <Select
+          name="service_id"
+          label="Service"
+          required
+          value={form.service_id}
+          onChange={(e) => handleServiceChange(e.target.value)}
+          error={errors['service_id']?.[0]}
+          options={services.map((s) => ({
+            value: s.id,
+            label: `${s.name} - $${parseFloat(s.base_price).toFixed(2)}`,
+          }))}
+          placeholder="Select a service"
+        />
 
         {/* Technician (optional) */}
-        <div>
-          <label htmlFor="technician_id" className="block text-sm font-medium text-gray-700">
-            Assign Technician
-          </label>
-          <select
-            id="technician_id"
-            value={form.technician_id}
-            onChange={(e) => handleChange('technician_id', e.target.value)}
-            className={inputClass('technician_id')}
-          >
-            <option value="">Unassigned</option>
-            {technicians.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-              </option>
-            ))}
-          </select>
-          {fieldError('technician_id')}
-        </div>
+        <Select
+          name="technician_id"
+          label="Assign Technician"
+          value={form.technician_id}
+          onChange={(e) => handleChange('technician_id', e.target.value)}
+          error={errors['technician_id']?.[0]}
+          options={technicians.map((t) => ({
+            value: t.id,
+            label: t.name,
+          }))}
+          placeholder="Unassigned"
+        />
 
         {/* Priority */}
-        <div>
-          <label htmlFor="priority" className="block text-sm font-medium text-gray-700">
-            Priority
-          </label>
-          <select
-            id="priority"
-            value={form.priority}
-            onChange={(e) => handleChange('priority', e.target.value)}
-            className={inputClass('priority')}
-          >
-            {JOB_PRIORITIES.map((p) => (
-              <option key={p} value={p}>
-                {priorityLabels[p]}
-              </option>
-            ))}
-          </select>
-          {fieldError('priority')}
-        </div>
+        <Select
+          name="priority"
+          label="Priority"
+          value={form.priority}
+          onChange={(e) => handleChange('priority', e.target.value)}
+          error={errors['priority']?.[0]}
+          options={JOB_PRIORITIES.map((p) => ({
+            value: p,
+            label: priorityLabels[p],
+          }))}
+        />
 
         {/* Scheduled Date */}
-        <div>
-          <label htmlFor="scheduled_date" className="block text-sm font-medium text-gray-700">
-            Scheduled Date <span className="text-red-500">*</span>
-          </label>
-          <input
-            id="scheduled_date"
-            type="date"
-            required
-            value={form.scheduled_date}
-            onChange={(e) => handleChange('scheduled_date', e.target.value)}
-            className={inputClass('scheduled_date')}
-          />
-          {fieldError('scheduled_date')}
-        </div>
+        <FormField
+          name="scheduled_date"
+          type="date"
+          label="Scheduled Date"
+          required
+          value={form.scheduled_date}
+          onChange={(e) => handleChange('scheduled_date', e.target.value)}
+          error={errors['scheduled_date']?.[0]}
+        />
 
         {/* Scheduled Time */}
-        <div>
-          <label htmlFor="scheduled_time" className="block text-sm font-medium text-gray-700">
-            Scheduled Time
-          </label>
-          <input
-            id="scheduled_time"
-            type="time"
-            value={form.scheduled_time}
-            onChange={(e) => handleChange('scheduled_time', e.target.value)}
-            className={inputClass('scheduled_time')}
-          />
-          {fieldError('scheduled_time')}
-        </div>
+        <FormField
+          name="scheduled_time"
+          type="time"
+          label="Scheduled Time"
+          value={form.scheduled_time}
+          onChange={(e) => handleChange('scheduled_time', e.target.value)}
+          error={errors['scheduled_time']?.[0]}
+        />
 
         {/* Address */}
         <div className="sm:col-span-2">
-          <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-            Service Address <span className="text-red-500">*</span>
-          </label>
-          <input
-            id="address"
+          <FormField
+            name="address"
             type="text"
+            label="Service Address"
             required
             value={form.address}
             onChange={(e) => handleChange('address', e.target.value)}
-            placeholder="Auto-filled from customer if empty"
-            className={inputClass('address')}
+            error={errors['address']?.[0]}
+            helperText="Auto-filled from customer if empty"
           />
-          {fieldError('address')}
         </div>
 
         {/* Total Cost */}
         <div>
-          <label htmlFor="total_cost" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="total_cost" className="block text-sm font-medium text-gray-700 mb-1.5">
             Total Cost
           </label>
-          <div className="relative mt-1">
+          <div className="relative">
             <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
               $
             </span>
@@ -287,44 +231,33 @@ export default function JobForm({
               value={form.total_cost}
               onChange={(e) => handleChange('total_cost', e.target.value)}
               placeholder="Auto-filled from service"
-              className={`pl-7 ${inputClass('total_cost')}`}
+              className="block w-full pl-7 px-3 py-2 rounded-base border border-gray-300 text-sm placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
             />
           </div>
-          {fieldError('total_cost')}
+          {errors['total_cost']?.[0] && <p className="mt-1 text-sm text-red-600">{errors['total_cost'][0]}</p>}
         </div>
 
         {/* Description / Notes */}
         <div className="sm:col-span-2">
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-            Notes
-          </label>
-          <textarea
+          <Textarea
             id="description"
+            label="Notes"
             rows={3}
             value={form.description}
             onChange={(e) => handleChange('description', e.target.value)}
             placeholder="Additional details about the job..."
-            className={inputClass('description')}
+            error={errors['description']?.[0]}
           />
-          {fieldError('description')}
         </div>
       </div>
 
-      <div className="flex justify-end gap-3">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-        >
+      <div className="flex justify-end gap-3 pt-4">
+        <Button type="button" variant="secondary" onClick={onCancel} disabled={submitting}>
           Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={submitting}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-        >
-          {submitting ? 'Saving...' : submitLabel}
-        </button>
+        </Button>
+        <Button type="submit" variant="primary" loading={submitting}>
+          {submitLabel}
+        </Button>
       </div>
     </form>
   );

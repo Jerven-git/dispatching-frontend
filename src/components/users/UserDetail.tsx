@@ -5,12 +5,19 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { ROLE_LABELS } from '@/lib/roles';
+import { Button, Card, Badge, PageHeader } from '@/components/ui';
 import type { User } from '@/types';
 
 interface UserDetailProps {
   userId: string;
   basePath: string;
 }
+
+const ROLE_BADGE_VARIANT: Record<string, 'primary' | 'info' | 'success'> = {
+  admin: 'primary',
+  dispatcher: 'info',
+  technician: 'success',
+};
 
 export default function UserDetail({ userId, basePath }: UserDetailProps) {
   const [user, setUser] = useState<User | null>(null);
@@ -50,39 +57,30 @@ export default function UserDetail({ userId, basePath }: UserDetailProps) {
 
   if (!user) {
     return (
-      <div className="rounded-lg bg-white p-12 text-center text-gray-500 shadow-sm">
-        User not found.
-      </div>
+      <Card padding="lg">
+        <p className="text-center text-gray-500">User not found.</p>
+      </Card>
     );
   }
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <Link href={basePath} className="text-sm text-blue-600 hover:text-blue-800">
-            &larr; Back to Users
-          </Link>
-          <h1 className="mt-2 text-2xl font-bold">{user.name}</h1>
-        </div>
-        <div className="flex gap-3">
-          <Link
-            href={`${basePath}/${user.id}/edit`}
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-          >
-            Edit
-          </Link>
-          <button
-            onClick={handleDelete}
-            disabled={deleting}
-            className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
-          >
-            {deleting ? 'Deleting...' : 'Delete'}
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title={user.name}
+        backLink={{ href: basePath, label: 'Back to Users' }}
+        actions={
+          <>
+            <Link href={`${basePath}/${user.id}/edit`}>
+              <Button variant="primary" size="sm">Edit</Button>
+            </Link>
+            <Button variant="destructive" size="sm" onClick={handleDelete} loading={deleting}>
+              Delete
+            </Button>
+          </>
+        }
+      />
 
-      <div className="rounded-lg bg-white p-6 shadow-sm">
+      <Card>
         <dl className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
           <div>
             <dt className="text-sm font-medium text-gray-500">Email</dt>
@@ -95,27 +93,17 @@ export default function UserDetail({ userId, basePath }: UserDetailProps) {
           <div>
             <dt className="text-sm font-medium text-gray-500">Role</dt>
             <dd className="mt-1">
-              <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                user.role === 'admin'
-                  ? 'bg-purple-100 text-purple-800'
-                  : user.role === 'dispatcher'
-                    ? 'bg-blue-100 text-blue-800'
-                    : 'bg-green-100 text-green-800'
-              }`}>
+              <Badge variant={ROLE_BADGE_VARIANT[user.role] || 'neutral'}>
                 {ROLE_LABELS[user.role]}
-              </span>
+              </Badge>
             </dd>
           </div>
           <div>
             <dt className="text-sm font-medium text-gray-500">Status</dt>
             <dd className="mt-1">
-              <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                user.is_active
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-red-100 text-red-800'
-              }`}>
+              <Badge variant={user.is_active ? 'success' : 'danger'}>
                 {user.is_active ? 'Active' : 'Inactive'}
-              </span>
+              </Badge>
             </dd>
           </div>
           <div>
@@ -125,7 +113,7 @@ export default function UserDetail({ userId, basePath }: UserDetailProps) {
             </dd>
           </div>
         </dl>
-      </div>
+      </Card>
     </div>
   );
 }

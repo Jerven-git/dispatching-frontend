@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { Input, Button, Card, Table, TableHeader, TableBody, TableHead, TableRow, TableCell, Pagination } from '@/components/ui';
 import type { Customer, PaginatedResponse } from '@/types';
 
 interface CustomerListProps {
@@ -44,107 +45,93 @@ export default function CustomerList({ basePath }: CustomerListProps) {
   }, [page, search, fetchCustomers]);
 
   return (
-    <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Customers</h1>
-        <div className="flex gap-3">
-          <input
-            type="text"
-            placeholder="Search customers..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm w-64"
-          />
-          <Link
-            href={`${basePath}/create`}
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-          >
-            Add Customer
-          </Link>
+    <div className="space-y-6">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Customers</h1>
+          <p className="mt-1 text-sm text-gray-600">Manage your customer database</p>
         </div>
+        <Link
+          href={`${basePath}/create`}
+          className="inline-block"
+        >
+          <Button variant="primary">
+            + Add Customer
+          </Button>
+        </Link>
       </div>
 
+      {/* Search Bar */}
+      <div className="w-full sm:w-80">
+        <Input
+          type="text"
+          placeholder="Search by name, phone, email..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          fullWidth
+        />
+      </div>
+
+      {/* Table or Loading State */}
       {loading ? (
-        <div className="space-y-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-16 rounded-lg bg-gray-200 animate-pulse" />
-          ))}
-        </div>
+        <Card>
+          <div className="space-y-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="h-12 rounded bg-gray-200 animate-pulse" />
+            ))}
+          </div>
+        </Card>
       ) : customers.length === 0 ? (
-        <div className="rounded-lg bg-white p-12 text-center text-gray-500 shadow-sm">
-          No customers found.
-        </div>
+        <Card padding="lg">
+          <div className="text-center py-8">
+            <p className="text-gray-500 text-sm">No customers found.</p>
+          </div>
+        </Card>
       ) : (
         <>
-          <div className="overflow-hidden rounded-lg bg-white shadow-sm">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Phone</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Address</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">City</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium uppercase text-gray-500">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {customers.map((customer) => (
-                  <tr key={customer.id} className="hover:bg-gray-50">
-                    <td className="whitespace-nowrap px-6 py-4 text-sm font-medium">
-                      <Link href={`${basePath}/${customer.id}`} className="text-blue-600 hover:text-blue-800">
-                        {customer.name}
-                      </Link>
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
-                      {customer.phone}
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
-                      {customer.email || '-'}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-700 max-w-xs truncate">
-                      {customer.address}
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-700">
-                      {customer.city || '-'}
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
-                      <Link
-                        href={`${basePath}/${customer.id}/edit`}
-                        className="text-blue-600 hover:text-blue-800 font-medium"
-                      >
-                        Edit
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>City</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {customers.map((customer) => (
+                <TableRow key={customer.id}>
+                  <TableCell>
+                    <Link href={`${basePath}/${customer.id}`} className="text-indigo-600 hover:text-indigo-700 font-medium">
+                      {customer.name}
+                    </Link>
+                  </TableCell>
+                  <TableCell>{customer.phone}</TableCell>
+                  <TableCell>{customer.email || '-'}</TableCell>
+                  <TableCell>{customer.city || '-'}</TableCell>
+                  <TableCell className="text-right">
+                    <Link
+                      href={`${basePath}/${customer.id}/edit`}
+                      className="text-indigo-600 hover:text-indigo-700 text-sm font-medium"
+                    >
+                      Edit
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
 
           {meta && meta.last_page > 1 && (
-            <div className="mt-4 flex items-center justify-between">
-              <p className="text-sm text-gray-600">
-                Showing {(meta.current_page - 1) * meta.per_page + 1} to{' '}
-                {Math.min(meta.current_page * meta.per_page, meta.total)} of {meta.total} customers
-              </p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={meta.current_page === 1}
-                  className="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm disabled:opacity-50"
-                >
-                  Previous
-                </button>
-                <button
-                  onClick={() => setPage((p) => Math.min(meta.last_page, p + 1))}
-                  disabled={meta.current_page === meta.last_page}
-                  className="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm disabled:opacity-50"
-                >
-                  Next
-                </button>
-              </div>
-            </div>
+            <Pagination
+              currentPage={meta.current_page}
+              totalPages={meta.last_page}
+              totalItems={meta.total}
+              itemsPerPage={meta.per_page}
+              onPageChange={setPage}
+            />
           )}
         </>
       )}

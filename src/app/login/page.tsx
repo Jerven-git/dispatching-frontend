@@ -4,6 +4,8 @@ import { useState, FormEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { getHomePath } from '@/lib/roles';
+import { Input, Button, Alert, Card } from '@/components/ui';
+import { Zap } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -36,58 +38,47 @@ export default function LoginPage() {
   if (loading) return null;
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50/50 px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Dispatching System</h1>
-          <p className="mt-2 text-gray-600">Sign in to your account</p>
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600">
+            <Zap className="h-6 w-6 text-white" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900">Dispatching System</h1>
+          <p className="mt-2 text-sm text-gray-500">Sign in to your account</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="rounded-lg bg-white p-8 shadow-md space-y-6">
-          {error && (
-            <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">
-              {error}
-            </div>
-          )}
+        <Card variant="elevated" padding="lg">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {error && <Alert variant="error">{error}</Alert>}
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
+            <Input
               id="email"
               type="email"
+              label="Email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               placeholder="admin@dispatch.test"
+              fullWidth
             />
-          </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
+            <Input
               id="password"
               type="password"
+              label="Password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               placeholder="password"
+              fullWidth
             />
-          </div>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full rounded-md bg-blue-600 px-4 py-2 text-white font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
-          >
-            {submitting ? 'Signing in...' : 'Sign in'}
-          </button>
-        </form>
+            <Button type="submit" fullWidth loading={submitting} variant="primary" size="lg">
+              Sign in
+            </Button>
+          </form>
+        </Card>
       </div>
     </div>
   );

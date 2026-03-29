@@ -75,7 +75,7 @@ export default function ReportsPage() {
       {summary && (
         <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           {[
-            { label: 'Total Jobs', value: summary.total_jobs, color: 'bg-blue-500' },
+            { label: 'Total Jobs', value: summary.total_jobs, color: 'bg-indigo-500' },
             { label: 'Completed', value: summary.completed_jobs, color: 'bg-green-500' },
             { label: 'In Progress', value: summary.in_progress_jobs, color: 'bg-orange-500' },
             { label: 'Pending', value: summary.pending_jobs, color: 'bg-yellow-500' },

@@ -9,7 +9,6 @@ import {
   statusLabels,
   priorityColors,
   priorityLabels,
-  JOB_STATUSES,
 } from '@/lib/job-constants';
 import type { ServiceJob, JobStatus } from '@/types';
 
@@ -32,12 +31,12 @@ function StatusProgressBar({ current }: { current: JobStatus }) {
         <div key={status} className="flex flex-1 flex-col items-center">
           <div
             className={`h-2 w-full rounded-full ${
-              idx <= currentIdx ? 'bg-blue-600' : 'bg-gray-200'
+              idx <= currentIdx ? 'bg-indigo-600' : 'bg-gray-200'
             }`}
           />
           <span
             className={`mt-1 text-[10px] leading-tight ${
-              idx <= currentIdx ? 'font-medium text-blue-700' : 'text-gray-400'
+              idx <= currentIdx ? 'font-medium text-indigo-700' : 'text-gray-400'
             }`}
           >
             {statusLabels[status]}
@@ -133,7 +132,7 @@ export default function TechnicianJobDetailPage({
       {/* Back link */}
       <Link
         href="/technician/my-jobs"
-        className="mb-4 inline-flex items-center text-sm text-blue-600 active:text-blue-800"
+        className="mb-4 inline-flex items-center text-sm text-indigo-600 active:text-indigo-700"
       >
         &larr; Back to My Jobs
       </Link>
@@ -171,7 +170,7 @@ export default function TechnicianJobDetailPage({
         {job.customer?.phone && (
           <a
             href={`tel:${job.customer.phone}`}
-            className="mt-1 inline-block text-sm text-blue-600 active:text-blue-800"
+            className="mt-1 inline-block text-sm text-indigo-600 active:text-indigo-700"
           >
             {job.customer.phone}
           </a>
@@ -182,7 +181,7 @@ export default function TechnicianJobDetailPage({
             href={`https://maps.google.com/?q=${encodeURIComponent(job.address)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-0.5 block text-sm text-blue-600 active:text-blue-800"
+            className="mt-0.5 block text-sm text-indigo-600 active:text-indigo-700"
           >
             {job.address}
           </a>
@@ -273,7 +272,7 @@ export default function TechnicianJobDetailPage({
             rows={3}
             disabled={isTerminal}
             placeholder="Add work notes, findings, or issues..."
-            className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+            className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:bg-gray-50 disabled:text-gray-500"
           />
           {!isTerminal && (
             <div className="mt-2 flex items-center justify-between">
