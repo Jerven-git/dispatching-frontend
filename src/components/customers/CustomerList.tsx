@@ -34,15 +34,10 @@ export default function CustomerList({ basePath }: CustomerListProps) {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setPage(1);
-      fetchCustomers(search, 1);
+      fetchCustomers(search, page);
     }, 300);
     return () => clearTimeout(timeout);
-  }, [search, fetchCustomers]);
-
-  useEffect(() => {
-    if (page > 1) fetchCustomers(search, page);
-  }, [page, search, fetchCustomers]);
+  }, [search, page, fetchCustomers]);
 
   return (
     <div className="space-y-6">
@@ -68,7 +63,7 @@ export default function CustomerList({ basePath }: CustomerListProps) {
           type="text"
           placeholder="Search by name, phone, email..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
           fullWidth
         />
       </div>

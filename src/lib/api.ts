@@ -17,19 +17,37 @@ export class ApiError extends Error {
   }
 }
 
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+}
+
+const DEFAULT_CACHE_TTL = 30_000; // 30 seconds
+
 class ApiClient {
+  private cache = new Map<string, CacheEntry<unknown>>();
+  private inflight = new Map<string, Promise<unknown>>();
+  private csrfTokenCache: string | null = null;
+  private csrfCookieString: string | null = null;
+
   async getCsrfCookie(): Promise<void> {
     await fetch(`${BASE_URL}/sanctum/csrf-cookie`, {
       credentials: 'include',
     });
+    this.csrfTokenCache = null; // force re-parse after new cookie
   }
 
   private getCsrfToken(): string {
-    const match = document.cookie
+    const currentCookie = document.cookie;
+    if (this.csrfTokenCache !== null && this.csrfCookieString === currentCookie) {
+      return this.csrfTokenCache;
+    }
+    this.csrfCookieString = currentCookie;
+    const match = currentCookie
       .split('; ')
       .find((row) => row.startsWith('XSRF-TOKEN='));
-    if (!match) return '';
-    return decodeURIComponent(match.split('=')[1]);
+    this.csrfTokenCache = match ? decodeURIComponent(match.split('=')[1]) : '';
+    return this.csrfTokenCache;
   }
 
   private async request<T>(
@@ -76,14 +94,40 @@ class ApiClient {
     return response.json();
   }
 
-  get<T>(endpoint: string, params?: Record<string, string>) {
+  get<T>(endpoint: string, params?: Record<string, string>, options?: { cacheTtl?: number; skipCache?: boolean }): Promise<T> {
     const query = params
       ? '?' + new URLSearchParams(params).toString()
       : '';
-    return this.request<T>(`${endpoint}${query}`);
+    const url = `${endpoint}${query}`;
+    const ttl = options?.cacheTtl ?? DEFAULT_CACHE_TTL;
+
+    // Return cached data if still fresh
+    if (!options?.skipCache) {
+      const cached = this.cache.get(url);
+      if (cached && Date.now() - cached.timestamp < ttl) {
+        return Promise.resolve(cached.data as T);
+      }
+    }
+
+    // Deduplicate concurrent requests to the same URL
+    const existing = this.inflight.get(url);
+    if (existing) return existing as Promise<T>;
+
+    const promise = this.request<T>(url)
+      .then((data) => {
+        this.cache.set(url, { data, timestamp: Date.now() });
+        return data;
+      })
+      .finally(() => {
+        this.inflight.delete(url);
+      });
+
+    this.inflight.set(url, promise);
+    return promise;
   }
 
   post<T>(endpoint: string, data?: unknown) {
+    this.invalidateCache(endpoint);
     return this.request<T>(endpoint, {
       method: 'POST',
       body: JSON.stringify(data),
@@ -91,6 +135,7 @@ class ApiClient {
   }
 
   put<T>(endpoint: string, data?: unknown) {
+    this.invalidateCache(endpoint);
     return this.request<T>(endpoint, {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -98,6 +143,7 @@ class ApiClient {
   }
 
   patch<T>(endpoint: string, data?: unknown) {
+    this.invalidateCache(endpoint);
     return this.request<T>(endpoint, {
       method: 'PATCH',
       body: JSON.stringify(data),
@@ -105,7 +151,24 @@ class ApiClient {
   }
 
   delete<T>(endpoint: string) {
+    this.invalidateCache(endpoint);
     return this.request<T>(endpoint, { method: 'DELETE' });
+  }
+
+  /** Clear cached entries whose key starts with the base endpoint */
+  private invalidateCache(endpoint: string) {
+    const base = endpoint.split('?')[0];
+    for (const key of this.cache.keys()) {
+      if (key.startsWith(base)) {
+        this.cache.delete(key);
+      }
+    }
+  }
+
+  /** Manually clear all cache (useful after login/logout) */
+  clearCache() {
+    this.cache.clear();
+    this.inflight.clear();
   }
 }
 

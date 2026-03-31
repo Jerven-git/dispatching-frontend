@@ -75,19 +75,13 @@ export default function JobList({
     [apiEndpoint]
   );
 
-  // Debounced search + immediate filter changes
+  // Debounced fetch: resets to page 1 on filter/search change, or fetches current page on page change
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setPage(1);
-      fetchJobs({ status: statusFilter, priority: priorityFilter, search, page: 1 });
+      fetchJobs({ status: statusFilter, priority: priorityFilter, search, page });
     }, 300);
     return () => clearTimeout(timeout);
-  }, [statusFilter, priorityFilter, search, fetchJobs]);
-
-  useEffect(() => {
-    if (page > 1)
-      fetchJobs({ status: statusFilter, priority: priorityFilter, search, page });
-  }, [page, statusFilter, priorityFilter, search, fetchJobs]);
+  }, [statusFilter, priorityFilter, search, page, fetchJobs]);
 
   const handleStatusUpdate = async (jobId: number, status: string) => {
     if (onStatusUpdate) {
@@ -117,18 +111,18 @@ export default function JobList({
               <Input
                 placeholder="Search ref# or customer..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               />
             </div>
             <Select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
               options={statusOptions}
               placeholder="All Statuses"
             />
             <Select
               value={priorityFilter}
-              onChange={(e) => setPriorityFilter(e.target.value)}
+              onChange={(e) => { setPriorityFilter(e.target.value); setPage(1); }}
               options={priorityOptions}
               placeholder="All Priorities"
             />
