@@ -180,3 +180,19 @@ export interface DashboardStats {
   total_technicians?: number;
   todays_jobs: number;
 }
+
+export interface AppNotification {
+  id: string;
+  type: string;
+  data: {
+    title: string;
+    message: string;
+    job_id?: number;
+    reference_number?: string;
+    type: string;
+    old_status?: string;
+    new_status?: string;
+  };
+  read_at: string | null;
+  created_at: string;
+}
