@@ -63,7 +63,7 @@ export default function TechnicianJobDetailPage({
 
   useEffect(() => {
     api
-      .get<{ job: ServiceJob }>(`/service-jobs/${id}`)
+      .get<{ job: ServiceJob }>(`/my-jobs/${id}`)
       .then((data) => {
         setJob(data.job);
         setNotes(data.job.technician_notes ?? '');

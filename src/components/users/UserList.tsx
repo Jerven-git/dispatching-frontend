@@ -43,15 +43,10 @@ export default function UserList({ basePath }: UserListProps) {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setPage(1);
-      fetchUsers(search, roleFilter, 1);
+      fetchUsers(search, roleFilter, page);
     }, 300);
     return () => clearTimeout(timeout);
-  }, [search, roleFilter, fetchUsers]);
-
-  useEffect(() => {
-    if (page > 1) fetchUsers(search, roleFilter, page);
-  }, [page, search, roleFilter, fetchUsers]);
+  }, [search, roleFilter, page, fetchUsers]);
 
   const roles = [
     { value: 'admin', label: 'Admin' },
@@ -67,14 +62,14 @@ export default function UserList({ basePath }: UserListProps) {
           <>
             <Select
               value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
+              onChange={(e) => { setRoleFilter(e.target.value); setPage(1); }}
               options={roles}
               placeholder="All Roles"
             />
             <Input
               placeholder="Search users..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               className="w-64"
             />
             <Link href={`${basePath}/create`}>
