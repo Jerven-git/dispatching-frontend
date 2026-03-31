@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROLE_LABELS } from '@/lib/roles';
-import { LayoutDashboard, Briefcase, Users, Wrench, ClipboardList, BarChart3, Zap, Settings, LogOut, X, Menu } from 'lucide-react';
+import { LayoutDashboard, Briefcase, Users, Wrench, ClipboardList, BarChart3, CalendarDays, Zap, Settings, LogOut, X, Menu } from 'lucide-react';
+import NotificationBell from './NotificationBell';
 import type { Role } from '@/types';
 import type { LucideIcon } from 'lucide-react';
 
@@ -23,11 +24,13 @@ const navigation: NavItem[] = [
   { name: 'Customers', href: '/admin/customers', roles: ['admin'], icon: Users },
   { name: 'Services', href: '/admin/services', roles: ['admin'], icon: Wrench },
   { name: 'Users', href: '/admin/users', roles: ['admin'], icon: ClipboardList },
+  { name: 'Calendar', href: '/admin/calendar', roles: ['admin'], icon: CalendarDays },
   { name: 'Reports', href: '/admin/reports', roles: ['admin'], icon: BarChart3 },
   // Dispatcher
   { name: 'Dashboard', href: '/dispatcher', roles: ['dispatcher'], icon: LayoutDashboard },
   { name: 'Jobs', href: '/dispatcher/jobs', roles: ['dispatcher'], icon: Briefcase },
   { name: 'Customers', href: '/dispatcher/customers', roles: ['dispatcher'], icon: Users },
+  { name: 'Calendar', href: '/dispatcher/calendar', roles: ['dispatcher'], icon: CalendarDays },
   { name: 'Reports', href: '/dispatcher/reports', roles: ['dispatcher'], icon: BarChart3 },
   // Technician
   { name: 'Dashboard', href: '/technician', roles: ['technician'], icon: LayoutDashboard },
@@ -94,6 +97,10 @@ export default function Sidebar() {
 
       {/* Bottom section */}
       <div className="mt-auto border-t border-gray-100 p-3 space-y-1">
+        <div className="flex items-center justify-between px-3 py-2">
+          <span className="text-xs font-medium text-gray-400 uppercase">Notifications</span>
+          <NotificationBell />
+        </div>
         <button
           onClick={logout}
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
