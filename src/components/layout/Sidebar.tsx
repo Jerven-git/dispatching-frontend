@@ -4,8 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { ROLE_LABELS } from '@/lib/roles';
-import { LayoutDashboard, Briefcase, Users, Wrench, ClipboardList, BarChart3, CalendarDays, Zap, Settings, LogOut, X, Menu } from 'lucide-react';
+import { LayoutDashboard, Briefcase, Users, Wrench, ClipboardList, BarChart3, CalendarDays, Zap, LogOut, X, Menu, FileText, Package, PieChart, Building2, Shield, ScrollText } from 'lucide-react';
 import NotificationBell from './NotificationBell';
 import type { Role } from '@/types';
 import type { LucideIcon } from 'lucide-react';
@@ -23,13 +22,21 @@ const navigation: NavItem[] = [
   { name: 'Jobs', href: '/admin/jobs', roles: ['admin'], icon: Briefcase },
   { name: 'Customers', href: '/admin/customers', roles: ['admin'], icon: Users },
   { name: 'Services', href: '/admin/services', roles: ['admin'], icon: Wrench },
+  { name: 'Invoices', href: '/admin/invoices', roles: ['admin'], icon: FileText },
+  { name: 'Parts', href: '/admin/parts', roles: ['admin'], icon: Package },
   { name: 'Users', href: '/admin/users', roles: ['admin'], icon: ClipboardList },
   { name: 'Calendar', href: '/admin/calendar', roles: ['admin'], icon: CalendarDays },
   { name: 'Reports', href: '/admin/reports', roles: ['admin'], icon: BarChart3 },
+  { name: 'Analytics', href: '/admin/analytics', roles: ['admin'], icon: PieChart },
+  { name: 'Tenants', href: '/admin/tenants', roles: ['admin'], icon: Building2 },
+  { name: 'Roles', href: '/admin/roles', roles: ['admin'], icon: Shield },
+  { name: 'Audit Logs', href: '/admin/audit-logs', roles: ['admin'], icon: ScrollText },
   // Dispatcher
   { name: 'Dashboard', href: '/dispatcher', roles: ['dispatcher'], icon: LayoutDashboard },
   { name: 'Jobs', href: '/dispatcher/jobs', roles: ['dispatcher'], icon: Briefcase },
   { name: 'Customers', href: '/dispatcher/customers', roles: ['dispatcher'], icon: Users },
+  { name: 'Invoices', href: '/dispatcher/invoices', roles: ['dispatcher'], icon: FileText },
+  { name: 'Parts', href: '/dispatcher/parts', roles: ['dispatcher'], icon: Package },
   { name: 'Calendar', href: '/dispatcher/calendar', roles: ['dispatcher'], icon: CalendarDays },
   { name: 'Reports', href: '/dispatcher/reports', roles: ['dispatcher'], icon: BarChart3 },
   // Technician
