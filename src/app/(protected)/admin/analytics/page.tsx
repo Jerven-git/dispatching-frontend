@@ -57,11 +57,11 @@ export default function AnalyticsPage() {
       ),
     ])
       .then(([revenueRes, serviceRes, customerRes, profitRes]) => {
-        setRevenueTrend(revenueRes.data);
-        setServicePopularity(serviceRes.data);
-        setCustomerLtv(customerRes.data);
-        setProfitability(profitRes.data);
-        setProfitSummary(profitRes.summary);
+        setRevenueTrend(revenueRes.data ?? []);
+        setServicePopularity(serviceRes.data ?? []);
+        setCustomerLtv(customerRes.data ?? []);
+        setProfitability(profitRes.data ?? []);
+        setProfitSummary(profitRes.summary ?? null);
       })
       .catch(console.error)
       .finally(() => setLoading(false));

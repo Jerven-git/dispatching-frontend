@@ -72,7 +72,7 @@ export default function ScheduledReportsPage() {
     setLoading(true);
     api
       .get<{ data: ScheduledReport[] }>('/scheduled-reports', undefined, { skipCache: true })
-      .then((res) => setReports(res.data))
+      .then((res) => setReports(res.data ?? []))
       .catch((err) => setError(err instanceof ApiError ? err.message : 'Failed to load reports'))
       .finally(() => setLoading(false));
   }, []);

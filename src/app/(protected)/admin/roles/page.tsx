@@ -53,8 +53,8 @@ export default function RolesPage() {
       api.get<{ data: Permission[] }>('/permissions', undefined, { skipCache: true }),
     ])
       .then(([rolesRes, permsRes]) => {
-        setRoles(rolesRes.data);
-        setPermissions(permsRes.data);
+        setRoles(rolesRes.data ?? []);
+        setPermissions(permsRes.data ?? []);
       })
       .catch((err) => setError(err instanceof ApiError ? err.message : 'Failed to load data'))
       .finally(() => setLoading(false));
