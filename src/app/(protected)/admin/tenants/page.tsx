@@ -57,7 +57,7 @@ export default function TenantsPage() {
     setLoading(true);
     api
       .get<{ data: Tenant[] }>('/tenants', undefined, { skipCache: true })
-      .then((res) => setTenants(res.data))
+      .then((res) => setTenants(res.data ?? []))
       .catch((err) => setError(err instanceof ApiError ? err.message : 'Failed to load tenants'))
       .finally(() => setLoading(false));
   }, []);

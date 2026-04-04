@@ -30,7 +30,7 @@ export default function NotificationBell() {
     setLoading(true);
     api
       .get<PaginatedResponse<AppNotification>>('/notifications', { per_page: '10' }, { skipCache: true })
-      .then((data) => setNotifications(data.data))
+      .then((data) => setNotifications(data.data ?? []))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [user]);
